@@ -136,6 +136,8 @@ def close_connection(exception):
     db = getattr(g, '_database', None)
     if db is not None: db.close()
 
+# Initialize database on startup (important for Render)
+init_db()
+
 if __name__ == '__main__':
-    init_db()
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT",5000)))
