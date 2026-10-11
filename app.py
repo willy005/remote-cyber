@@ -1,10 +1,10 @@
-from flask import Flask, render_template_string, request, redirect, g
-import sqlite3
-import datetime
-import os
+from flask import Flask, render_template_string, request, g
+import sqlite3, datetime, os, random
 
 app = Flask(__name__)
 DATABASE = 'cyber.db'
+TILL = "6534283"
+BUSINESS = "CYBER MTAANI"
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -17,119 +17,125 @@ def init_db():
     db.execute("""CREATE TABLE IF NOT EXISTS orders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT, phone TEXT, service TEXT, amount TEXT,
-        status TEXT DEFAULT 'Pending', date TEXT
+        receipt_no TEXT, status TEXT DEFAULT 'Pending', date TEXT
     )""")
-    db.commit()
-    db.close()
+    db.commit(); db.close()
 
 SERVICES = [
-    ("Passport Application", "🛂", "New, Renewal, Lost - 34/50/66 pages", "500"),
-    ("EPRA License T1 T2 T3 C1", "⚡", "Avoid 5K fine - Electrician & Solar", "800"),
-    ("KRA PIN Registration", "🧾", "Get KRA PIN in 10 Minutes", "300"),
-    ("KRA Tax Returns", "💰", "Nil Returns, PAYE, Turnover Tax", "500"),
-    ("Good Conduct (DCI)", "🏛️", "eCitizen Police Clearance", "600"),
-    ("Business Registration", "🏢", "Company, Business Name Search", "1500"),
-    ("CV & Cover Letter", "📄", "Professional Modern CV + ATS", "400"),
-    ("HELB / NTSA / SHA / eCitizen", "🎓", "Compliance & Applications", "600"),
+    ("Passport Application", "🛂", "New, Renewal, Lost", "500"),
+    ("EPRA License T1 T2 T3 C1", "⚡", "Electrician & Solar License", "800"),
+    ("KRA PIN Registration", "🧾", "In 10 Minutes", "300"),
+    ("KRA Tax Returns", "💰", "Nil, PAYE, Turnover", "500"),
+    ("Good Conduct DCI", "🏛️", "Police Clearance", "600"),
+    ("Business Registration", "🏢", "Company, Business Name", "1500"),
+    ("CV & Cover Letter", "📄", "Professional ATS CV", "400"),
+    ("HELB / NTSA / SHA", "🎓", "Compliance", "600"),
 ]
 
-TEMPLATE = """
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cyber Mtaani - Remote Cyber Services Kenya | 0706507594</title>
-<meta name="description" content="Fast Remote Cyber Services in Kenya - Passport, KRA, EPRA, Good Conduct. WhatsApp 0706507594">
-<style>
-*{margin:0;padding:0;box-sizing:border-box} body{font-family: 'Segoe UI', Arial; background:#f5f7fb; color:#222}
-.header{background: linear-gradient(135deg, #0a2a66 0%, #123d95 100%); color:white; padding:50px 20px; text-align:center}
-.header h1{font-size:36px; color:#ffcc00; letter-spacing:1px}.header p{margin:10px 0; opacity:0.9}
-.btn{display:inline-block; background:#ffcc00; color:#0a2a66; padding:14px 28px; border-radius:30px; font-weight:800; text-decoration:none; margin:8px; box-shadow:0 4px 12px rgba(0,0,0,0.2)}
-.btn-green{background:#25D366; color:white}
-.container{max-width:1100px; margin:0 auto; padding:20px}
-.services{display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:16px; margin-top:20px}
-.card{background:white; border-radius:16px; padding:20px; box-shadow:0 6px 18px rgba(0,0,0,0.06); border-left:5px solid #0a2a66; transition:0.2s}
-.card:hover{transform:translateY(-4px)}.icon{font-size:32px}.card h3{margin:8px 0; color:#0a2a66}
-.price{font-weight:800; color:#0a8a28; margin-top:8px}
-.order-btn{display:block; margin-top:12px; background:#0a2a66; color:#ffcc00; text-align:center; padding:10px; border-radius:8px; text-decoration:none; font-weight:700}
-.trust{background:white; margin:30px 0; padding:20px; border-radius:16px; display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap:15px; text-align:center}
-.footer{background:#0a2a66; color:white; text-align:center; padding:30px; margin-top:40px}
-input, select{width:100%; padding:12px; margin:8px 0; border-radius:8px; border:1px solid #ccc}
-</style>
-</head>
-<body>
+HOME = """
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cyber Mtaani - Remote Cyber Kenya</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Segoe UI,Arial;background:#f5f7fb}
+.header{background:linear-gradient(135deg,#0a2a66,#123d95);color:#fff;padding:45px 20px;text-align:center}
+.header h1{color:#ffcc00;font-size:34px}.btn{display:inline-block;background:#ffcc00;color:#0a2a66;padding:12px 22px;border-radius:30px;font-weight:800;text-decoration:none;margin:6px}
+.btn-green{background:#25D366;color:#fff}.container{max-width:1100px;margin:0 auto;padding:20px}
+.services{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.card{background:#fff;border-radius:14px;padding:18px;box-shadow:0 5px 15px rgba(0,0,0,.06);border-left:5px solid #0a2a66}
+.price{font-weight:800;color:#0a8a28}.order-btn{display:block;margin-top:10px;background:#0a2a66;color:#ffcc00;text-align:center;padding:9px;border-radius:8px;text-decoration:none;font-weight:700}
+.footer{background:#0a2a66;color:#fff;text-align:center;padding:25px;margin-top:30px}
+</style></head><body>
 <div class="header">
-<h1>CYBER MTAANI</h1>
-<p>REMOTE CYBER SERVICES • FAST • RELIABLE • 24/7</p>
-<p>📞 0706507594 | 📧 remotecyber@gmail.com</p>
-<div>
-<a class="btn" href="https://wa.me/254706507594?text=Hello%20Cyber%20Mtaani,%20I%20need%20help%20with">💬 WhatsApp Us Now</a>
-<a class="btn btn-green" href="tel:0706507594">📞 Call Now</a>
-</div>
-</div>
-
-<div class="container">
-<h2 style="text-align:center; color:#0a2a66; margin:20px 0">Our Services - Pay After Service</h2>
-
+<h1>CYBER MTAANI</h1><p>REMOTE CYBER SERVICES • 24/7 • ALL 47 COUNTIES</p>
+<p>📞 0706507594 | 💚 Till: 6534283</p>
+<div><a class="btn" href="https://wa.me/254706507594">💬 WhatsApp Order</a>
+<a class="btn btn-green" href="#services">Services</a></div></div>
+<div class="container" id="services">
+<h2 style="text-align:center;color:#0a2a66;margin:15px">Our Services</h2>
 <div class="services">
 {% for title, icon, desc, price in services %}
-<div class="card">
-<div class="icon">{{icon}}</div>
-<h3>{{title}}</h3>
-<p style="font-size:13px; color:#555">{{desc}}</p>
-<p class="price">From KES {{price}}</p>
-<a class="order-btn" href="https://wa.me/254706507594?text=Hello,%20I%20need%20{{title}}">Order via WhatsApp</a>
-</div>
-{% endfor %}
-</div>
+<div class="card"><div style="font-size:28px">{{icon}}</div><h3>{{title}}</h3><p style="font-size:13px;color:#555">{{desc}}</p>
+<p class="price">KES {{price}}</p><a class="order-btn" href="https://wa.me/254706507594?text=Habari%20Cyber%20Mtaani,%20nahitaji%20{{title}}%20-%20Niko%20tayari%20kulipa%20Till%20{{till}}">Order Now</a></div>
+{% endfor %}</div>
+<div style="background:#fff;padding:20px;border-radius:14px;margin-top:25px;text-align:center">
+<h3>How to Pay & Get Receipt</h3><p>1. WhatsApp us → 2. We do service → 3. Pay to Till <b>{{till}}</b> → 4. Get Auto Receipt + Document on WhatsApp</p>
+<p style="margin-top:10px;background:#e8f5e9;padding:10px;border-radius:8px">💚 <b>Lipa na M-Pesa</b> → Buy Goods → Till: <b>{{till}}</b> - CYBER MTAANI<br>After payment, send M-Pesa message for instant receipt</p>
+</div></div>
+<div class="footer"><h3>CYBER MTAANI</h3><p>© 2025 | Till: {{till}} | cybermtaani.onrender.com | 0706507594</p></div>
+</body></html>
+"""
 
-<div class="trust">
-<div><h3>⚡ 10 Min Service</h3><p>Most services done in 10-20 mins remotely</p></div>
-<div><h3>🔒 100% Secure</h3><p>Your data is safe & confidential</p></div>
-<div><h3>💰 Pay After</h3><p>Pay via M-Pesa Till after service done</p></div>
-<div><h3>🇰🇪 All Kenya</h3><p>Serving all 47 counties remotely</p></div>
-</div>
-
-<div style="background:white; padding:25px; border-radius:16px; text-align:center">
-<h2>How It Works</h2>
-<p style="margin:15px 0">1️⃣ WhatsApp us → 2️⃣ Send documents → 3️⃣ We process → 4️⃣ You pay via M-Pesa</p>
-<p><b>💚 Lipa na M-Pesa Till: 6534283 - Wilfred</b></p>
-<p style="font-size:13px">Pay after service is confirmed</p>
-</div>
-</div>
-
-<div class="footer">
-<h3>CYBER MTAANI</h3>
-<p>Remote Cyber Services Across Kenya</p>
-<p style="margin-top:10px">© 2025 Cyber Mtaani | 0706507594 | cybermtaani.onrender.com</p>
-<p style="font-size:12px; margin-top:10px; opacity:0.7">Passport • KRA • EPRA • eCitizen • NTSA • HELB • Business Registration</p>
-</div>
-</body>
-</html>
+RECEIPT_HTML = """
+<html><head><meta name="viewport" content="width=device-width, initial-scale=1"><style>
+body{font-family:Arial; background:#f0f0f0; padding:20px}.paper{background:#fff; max-width:400px; margin:0 auto; padding:25px; border-radius:10px; border-top:6px solid #0a2a66}
+h2{text-align:center; color:#0a2a66}.row{display:flex; justify-content:space-between; margin:8px 0; font-size:14px}
+hr{border:none; border-top:1px dashed #ccc; margin:15px 0}.stamp{text-align:center; margin-top:20px; border:2px solid #0a8a28; color:#0a8a28; padding:8px; border-radius:8px; font-weight:800; transform:rotate(-3deg)}
+.btn{display:block; text-align:center; background:#25D366; color:#fff; padding:12px; border-radius:8px; text-decoration:none; margin-top:15px; font-weight:700}
+</style></head><body>
+<div class="paper">
+<h2>CYBER MTAANI</h2><p style="text-align:center; font-size:12px">Remote Cyber Services | 0706507594<br>Till: {{till}}</p><hr>
+<div class="row"><b>Receipt No:</b><span>CM-{{receipt}}</span></div>
+<div class="row"><b>Date:</b><span>{{date}}</span></div>
+<div class="row"><b>Customer:</b><span>{{name}}</span></div>
+<div class="row"><b>Phone:</b><span>{{phone}}</span></div>
+<div class="row"><b>Service:</b><span>{{service}}</span></div>
+<div class="row"><b>Amount:</b><span>KES {{amount}}</span></div>
+<div class="row"><b>Payment:</b><span>M-Pesa Till {{till}}</span></div>
+<div class="row"><b>Status:</b><span style="color:green">✅ PAID & COMPLETED</span></div>
+<hr><p style="font-size:11px; text-align:center">Thank you for choosing Cyber Mtaani! Your document has been sent via WhatsApp.</p>
+<div class="stamp">PAID ✔ VERIFIED</div>
+<a class="btn" href="https://wa.me/254706507594?text=Receipt%20{{receipt}}%20confirmed">Share Receipt on WhatsApp</a>
+</div></body></html>
 """
 
 @app.route('/')
 def home():
-    return render_template_string(TEMPLATE, services=SERVICES)
+    return render_template_string(HOME, services=SERVICES, till=TILL)
+
+@app.route('/receipt/<int:order_id>')
+def receipt(order_id):
+    db = get_db()
+    cur = db.execute("SELECT * FROM orders WHERE id=?", (order_id,))
+    o = cur.fetchone()
+    if not o: return "Receipt not found"
+    return render_template_string(RECEIPT_HTML, receipt=o[5], date=o[6], name=o[1], phone=o[2], service=o[3], amount=o[4], till=TILL)
 
 @app.route('/admin-king')
 def admin():
     db = get_db()
     cur = db.execute("SELECT * FROM orders ORDER BY id DESC")
     orders = cur.fetchall()
-    html = "<h2>Orders Admin</h2><table border=1><tr><th>ID</th><th>Name</th><th>Phone</th><th>Service</th><th>Date</th></tr>"
+    html = f"""
+    <h2>Cyber Mtaani Admin - Till {TILL}</h2>
+    <form method='post' action='/add-order' style='background:#f5f5f5;padding:15px;border-radius:8px'>
+    <h3>Add New Paid Order + Generate Receipt</h3>
+    <input name='name' placeholder='Customer Name' required>
+    <input name='phone' placeholder='Phone e.g. 0706...' required>
+    <select name='service'><option>Passport Application</option><option>EPRA License</option><option>KRA PIN</option><option>KRA Returns</option><option>Good Conduct</option><option>Business Registration</option><option>CV</option><option>HELB/NTSA/SHA</option></select>
+    <input name='amount' placeholder='Amount e.g. 500' required>
+    <button type='submit'>Generate Receipt</button></form><hr>
+    <table border=1 cellpadding=6><tr><th>ID</th><th>Receipt</th><th>Name</th><th>Service</th><th>Amount</th><th>Link</th></tr>
+    """
     for o in orders:
-        html+=f"<tr><td>{o[0]}</td><td>{o[1]}</td><td>{o[2]}</td><td>{o[3]}</td><td>{o[5]}</td></tr>"
+        html+=f"<tr><td>{o[0]}</td><td>{o[5]}</td><td>{o[1]}</td><td>{o[3]}</td><td>{o[4]}</td><td><a href='/receipt/{o[0]}' target='_blank'>View Receipt</a> | <a href='https://wa.me/{o[2]}?text=Here is your receipt: https://cybermtaani.onrender.com/receipt/{o[0]}' target='_blank'>Send WhatsApp</a></td></tr>"
     html+="</table>"
     return html
+
+@app.route('/add-order', methods=['POST'])
+def add_order():
+    name = request.form['name']; phone = request.form['phone']; service = request.form['service']; amount = request.form['amount']
+    receipt_no = str(random.randint(10000,99999))
+    date = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
+    db = get_db()
+    db.execute("INSERT INTO orders (name,phone,service,amount,receipt_no,date,status) VALUES (?,?,?,?,?,?,?)", (name,phone,service,amount,receipt_no,date,'Paid'))
+    db.commit()
+    cur = db.execute("SELECT last_insert_rowid()"); oid = cur.fetchone()[0]
+    return redirect(f"/receipt/{oid}")
 
 @app.teardown_appcontext
 def close_connection(exception):
     db = getattr(g, '_database', None)
-    if db is not None:
-        db.close()
+    if db is not None: db.close()
 
 if __name__ == '__main__':
     init_db()
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT",5000)))
