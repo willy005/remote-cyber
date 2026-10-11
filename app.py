@@ -22,14 +22,14 @@ def init_db():
 init_db()
 
 SERVICES = [
-    ("Passport Application","🛂","New/Renewal/Lost","500"),
-    ("EPRA License","⚡","T1 T2 T3 C1 - Avoid 5K fine","800"),
-    ("KRA PIN","🧾","In 10 Minutes","300"),
-    ("KRA Returns","💰","Nil/PAYE/Turnover","500"),
-    ("Good Conduct","🏛️","DCI Clearance","600"),
-    ("Business Registration","🏢","Company Name","1500"),
-    ("CV & Cover Letter","📄","Pro CV","400"),
-    ("HELB/NTSA/SHA","🎓","Compliance","600"),
+    ("Passport Application","🛂","New/Renewal/Lost",""),
+    ("EPRA License","⚡","T1 T2 T3 C1 - Avoid 5K fine",""),
+    ("KRA PIN","🧾","In 10 Minutes",""),
+    ("KRA Returns","💰","Nil/PAYE/Turnover",""),
+    ("Good Conduct","🏛️","DCI Clearance",""),
+    ("Business Registration","🏢","Company Name",""),
+    ("CV & Cover Letter","📄","Pro CV",""),
+    ("HELB/NTSA/SHA","🎓","Compliance",""),
 ]
 
 PAGE = """
