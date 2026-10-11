@@ -35,12 +35,13 @@ SERVICES = [
 PAGE = """
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Cyber Mtaani - Kenya Digital Solutions - Till 6534283</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
 <style>
 body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0;color:#333}
-.h{background:#0a2a66;color:#fff;padding:30px 20px 40px;text-align:center}
-.h h1{color:#ffcc00;font-size:42px;margin:10px 0 0;letter-spacing:2px}
-.h p{color:#fff;margin:8px 0}
-.logo{width:260px;max-width:90%;background:#fff;padding:10px 20px;border-radius:12px;margin-bottom:15px;box-shadow:0 4px 15px rgba(0,0,0,0.2)}
+.h{background:#0a2a66;color:#fff;padding:50px 20px;text-align:center}
+.h h1{color:#ffcc00;font-size:42px;margin:0;letter-spacing:2px}
+.h p{color:#fff;margin:10px 0}
 .b{background:#ffcc00;color:#0a2a66;padding:14px 28px;border-radius:30px;text-decoration:none;font-weight:900;display:inline-block;margin:8px;font-size:16px}
 .b2{background:#25D366;color:#fff;padding:14px 28px;border-radius:30px;text-decoration:none;font-weight:900;display:inline-block;margin:8px}
 .c{max-width:1100px;margin:auto;padding:20px}
@@ -53,11 +54,10 @@ body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0;color:#333}
 .f b{color:#ffcc00}
 </style></head><body>
 <div class="h">
-<img src="/logo.png" alt="Cyber Mtaani Logo" class="logo" onerror="this.style.display='none'">
 <h1>CYBER MTAANI</h1>
 <p style="font-size:13px;letter-spacing:3px;color:#25D366;font-weight:800">Kenya Digital Solutions</p>
 <p style="font-size:16px;font-weight:700">All 47 Counties | Fast • 10 Minutes • Trusted Nationwide</p>
-<div style="margin-top:18px">
+<div style="margin-top:20px">
 <a class="b" href="https://wa.me/254706507594">💬 WhatsApp Us</a>
 <a class="b2" href="https://wa.me/254706507594?text=Habari%20Cyber%20Mtaani%2C%20nahitaji%20huduma">📲 Order Now</a>
 </div>
@@ -91,6 +91,13 @@ Trusted Across Kenya • All 47 Counties • Secure • Reliable<br>
 @app.route('/')
 def home(): return render_template_string(PAGE, services=SERVICES, till=TILL)
 
+@app.route('/favicon.png')
+def favicon():
+    try:
+        return send_from_directory('.', 'favicon.png')
+    except:
+        return "", 404
+
 @app.route('/logo.png')
 def logo():
     try:
@@ -109,7 +116,7 @@ def admin():
 def receipt(oid):
     db=get_db(); o=db.execute("SELECT * FROM orders WHERE id=?",(oid,)).fetchone()
     if not o: return "Not found"
-    return f"""<div style='max-width:400px;margin:30px auto;background:#fff;padding:25px;border-radius:12px;box-shadow:0 0 20px rgba(0,0,0,0.15);font-family:Arial;border-top:6px solid #0a2a66'><div style='text-align:center'><img src='/logo.png' style='width:200px' onerror=\"this.style.display='none'\"></div><h2 style='text-align:center;color:#0a2a66;margin:10px 0 0'>CYBER MTAANI</h2><p style='text-align:center;font-size:12px;color:#666;margin:5px'>Kenya Digital Solutions<br>Till {TILL} | 0706507594<br>cybermtaani.onrender.com</p><hr><p><b>Receipt No:</b> CM-{o[5]}<br><b>Date:</b> {o[6]}<br><b>Customer:</b> {o[1]}<br><b>Phone:</b> {o[2]}<br><b>Service:</b> {o[3]}<br><b>Amount Paid:</b> KES {o[4]}<br><b>Status:</b> <span style='color:green;font-weight:800'>PAID & VERIFIED</span></p><hr><div style='border:3px solid #2e7d32;color:#2e7d32;text-align:center;padding:10px;border-radius:8px;font-weight:900;font-size:18px'>✓ PAID VIA TILL {TILL}</div><p style='font-size:11px;text-align:center;color:#666;margin-top:15px'>Thank you for choosing Cyber Mtaani!</p></div>"""
+    return f"""<div style='max-width:400px;margin:30px auto;background:#fff;padding:25px;border-radius:12px;box-shadow:0 0 20px rgba(0,0,0,0.15);font-family:Arial;border-top:6px solid #0a2a66'><div style='text-align:center'><img src='/favicon.png' style='width:60px' onerror=\"this.style.display='none'\"></div><h2 style='text-align:center;color:#0a2a66;margin:10px 0 0'>CYBER MTAANI</h2><p style='text-align:center;font-size:12px;color:#666;margin:5px'>Kenya Digital Solutions<br>Till {TILL} | 0706507594<br>cybermtaani.onrender.com</p><hr><p><b>Receipt No:</b> CM-{o[5]}<br><b>Date:</b> {o[6]}<br><b>Customer:</b> {o[1]}<br><b>Phone:</b> {o[2]}<br><b>Service:</b> {o[3]}<br><b>Amount Paid:</b> KES {o[4]}<br><b>Status:</b> <span style='color:green;font-weight:800'>PAID & VERIFIED</span></p><hr><div style='border:3px solid #2e7d32;color:#2e7d32;text-align:center;padding:10px;border-radius:8px;font-weight:900;font-size:18px'>✓ PAID VIA TILL {TILL}</div><p style='font-size:11px;text-align:center;color:#666;margin-top:15px'>Thank you for choosing Cyber Mtaani!</p></div>"""
 
 @app.route('/add-order',methods=['POST'])
 def add():
