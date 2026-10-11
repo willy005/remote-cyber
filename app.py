@@ -1,4 +1,4 @@
-from flask import Flask, render_template_string, request, g, redirect
+from flask import Flask, render_template_string, request, g, redirect, send_from_directory
 import sqlite3, os, random, datetime
 
 app = Flask(__name__)
@@ -37,15 +37,15 @@ PAGE = """
 <title>Cyber Mtaani - Kenya Digital Solutions - Till 6534283</title>
 <style>
 body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0;color:#333}
-.h{background:#0a2a66;color:#fff;padding:50px 20px;text-align:center}
-.h h1{color:#ffcc00;font-size:42px;margin:0;letter-spacing:2px}
-.h p{color:#fff;margin:10px 0}
+.h{background:#0a2a66;color:#fff;padding:30px 20px 40px;text-align:center}
+.h h1{color:#ffcc00;font-size:42px;margin:10px 0 0;letter-spacing:2px}
+.h p{color:#fff;margin:8px 0}
+.logo{width:260px;max-width:90%;background:#fff;padding:10px 20px;border-radius:12px;margin-bottom:15px;box-shadow:0 4px 15px rgba(0,0,0,0.2)}
 .b{background:#ffcc00;color:#0a2a66;padding:14px 28px;border-radius:30px;text-decoration:none;font-weight:900;display:inline-block;margin:8px;font-size:16px}
 .b2{background:#25D366;color:#fff;padding:14px 28px;border-radius:30px;text-decoration:none;font-weight:900;display:inline-block;margin:8px}
 .c{max-width:1100px;margin:auto;padding:20px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px}
-.card{background:#fff;padding:20px;border-radius:14px;border-left:5px solid #0a2a66;box-shadow:0 4px 10px rgba(0,0,0,0.08);transition:0.2s}
-.card:hover{transform:translateY(-4px)}
+.card{background:#fff;padding:20px;border-radius:14px;border-left:5px solid #0a2a66;box-shadow:0 4px 10px rgba(0,0,0,0.08)}
 .card h3{margin:8px 0;color:#0a2a66}
 .card p{font-size:13px;color:#666;margin:5px 0}
 .btn{display:block;background:#0a2a66;color:#ffcc00;text-align:center;padding:10px;border-radius:8px;text-decoration:none;font-weight:800;margin-top:10px}
@@ -53,10 +53,11 @@ body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0;color:#333}
 .f b{color:#ffcc00}
 </style></head><body>
 <div class="h">
+<img src="/logo.png" alt="Cyber Mtaani Logo" class="logo" onerror="this.style.display='none'">
 <h1>CYBER MTAANI</h1>
-<p style="font-size:18px;font-weight:700">Kenya Digital Solutions | All 47 Counties | Fast • 10 Minutes</p>
-<p>Trusted • Professional • Reliable • Nationwide</p>
-<div style="margin-top:20px">
+<p style="font-size:13px;letter-spacing:3px;color:#25D366;font-weight:800">Kenya Digital Solutions</p>
+<p style="font-size:16px;font-weight:700">All 47 Counties | Fast • 10 Minutes • Trusted Nationwide</p>
+<div style="margin-top:18px">
 <a class="b" href="https://wa.me/254706507594">💬 WhatsApp Us</a>
 <a class="b2" href="https://wa.me/254706507594?text=Habari%20Cyber%20Mtaani%2C%20nahitaji%20huduma">📲 Order Now</a>
 </div>
@@ -82,13 +83,20 @@ body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0;color:#333}
 💚 Lipa na M-Pesa Till: {{till}} | Professional Receipt Issued | Pay After Service<br>
 🌐 cybermtaani.onrender.com | 💬 WhatsApp: 0706507594 | Available 24/7<br>
 Trusted Across Kenya • All 47 Counties • Secure • Reliable<br>
-© 2025 Cyber Mtaani - Licensed Digital Services Provider
+© 2025 Cyber Mtaani
 </div>
 </body></html>
 """
 
 @app.route('/')
 def home(): return render_template_string(PAGE, services=SERVICES, till=TILL)
+
+@app.route('/logo.png')
+def logo():
+    try:
+        return send_from_directory('.', 'logo.png')
+    except:
+        return "", 404
 
 @app.route('/admin-king')
 def admin():
@@ -101,7 +109,7 @@ def admin():
 def receipt(oid):
     db=get_db(); o=db.execute("SELECT * FROM orders WHERE id=?",(oid,)).fetchone()
     if not o: return "Not found"
-    return f"""<div style='max-width:400px;margin:30px auto;background:#fff;padding:25px;border-radius:12px;box-shadow:0 0 20px rgba(0,0,0,0.15);font-family:Arial;border-top:6px solid #0a2a66'><h2 style='text-align:center;color:#0a2a66;margin:0'>CYBER MTAANI</h2><p style='text-align:center;font-size:12px;color:#666;margin:5px'>Kenya Digital Solutions<br>Till {TILL} | 0706507594<br>cybermtaani.onrender.com</p><hr><p><b>Receipt No:</b> CM-{o[5]}<br><b>Date:</b> {o[6]}<br><b>Customer:</b> {o[1]}<br><b>Phone:</b> {o[2]}<br><b>Service:</b> {o[3]}<br><b>Amount Paid:</b> KES {o[4]}<br><b>Status:</b> <span style='color:green;font-weight:800'>PAID & VERIFIED</span></p><hr><div style='border:3px solid #2e7d32;color:#2e7d32;text-align:center;padding:10px;border-radius:8px;font-weight:900;font-size:18px'>✓ PAID VIA TILL {TILL}</div><p style='font-size:11px;text-align:center;color:#666;margin-top:15px'>Thank you for choosing Cyber Mtaani!<br>Professional • Reliable • Trusted</p></div>"""
+    return f"""<div style='max-width:400px;margin:30px auto;background:#fff;padding:25px;border-radius:12px;box-shadow:0 0 20px rgba(0,0,0,0.15);font-family:Arial;border-top:6px solid #0a2a66'><div style='text-align:center'><img src='/logo.png' style='width:200px' onerror=\"this.style.display='none'\"></div><h2 style='text-align:center;color:#0a2a66;margin:10px 0 0'>CYBER MTAANI</h2><p style='text-align:center;font-size:12px;color:#666;margin:5px'>Kenya Digital Solutions<br>Till {TILL} | 0706507594<br>cybermtaani.onrender.com</p><hr><p><b>Receipt No:</b> CM-{o[5]}<br><b>Date:</b> {o[6]}<br><b>Customer:</b> {o[1]}<br><b>Phone:</b> {o[2]}<br><b>Service:</b> {o[3]}<br><b>Amount Paid:</b> KES {o[4]}<br><b>Status:</b> <span style='color:green;font-weight:800'>PAID & VERIFIED</span></p><hr><div style='border:3px solid #2e7d32;color:#2e7d32;text-align:center;padding:10px;border-radius:8px;font-weight:900;font-size:18px'>✓ PAID VIA TILL {TILL}</div><p style='font-size:11px;text-align:center;color:#666;margin-top:15px'>Thank you for choosing Cyber Mtaani!</p></div>"""
 
 @app.route('/add-order',methods=['POST'])
 def add():
