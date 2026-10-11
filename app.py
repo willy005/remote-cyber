@@ -83,7 +83,7 @@ body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0;color:#333}
 💚 Lipa na M-Pesa Till: {{till}} | Professional Receipt Issued | Pay After Service<br>
 🌐 cybermtaani.onrender.com | 💬 WhatsApp: 0706507594 | Available 24/7<br>
 Trusted Across Kenya • All 47 Counties • Secure • Reliable<br>
-© 2025 Cyber Mtaani
+© 2026 Cyber Mtaani
 </div>
 </body></html>
 """
