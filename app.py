@@ -93,7 +93,7 @@ input, select{width:100%; padding:12px; margin:8px 0; border-radius:8px; border:
 <div style="background:white; padding:25px; border-radius:16px; text-align:center">
 <h2>How It Works</h2>
 <p style="margin:15px 0">1️⃣ WhatsApp us → 2️⃣ Send documents → 3️⃣ We process → 4️⃣ You pay via M-Pesa</p>
-<p><b>💚 Lipa na M-Pesa Till: 6534283 - CYBER MTAANI</b></p>
+<p><b>💚 Lipa na M-Pesa Till: 6534283 - Wilfred</b></p>
 <p style="font-size:13px">Pay after service is confirmed</p>
 </div>
 </div>
