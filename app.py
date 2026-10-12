@@ -46,7 +46,7 @@ SERVICES = [
   "price": 15000,
   "description": "Full website development - eCommerce, booking system, cyber portal like Cyber Mtaani. Hosting + domain + M-Pesa Till + admin panel included.",
   "delivery": "7 Days"
-}
+},
 ]
 
 PAGE = """
