@@ -2,7 +2,8 @@ from flask import Flask, render_template_string, request, g, redirect, send_from
 import sqlite3, os, random, datetime
 
 app = Flask(__name__)
-DATABASE = '/tmp/cyber.db'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATABASE = os.path.join(BASE_DIR, 'cyber.db')
 TILL = "6534283"
 
 def get_db():
