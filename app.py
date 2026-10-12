@@ -30,6 +30,23 @@ SERVICES = [
     ("CV & Cover Letter","📄","Professional CV - ATS Compliant"),
     ("HELB / NTSA / SHA","🎓","Compliance, Loans, Driving License"),
     ("eCitizen Services","💻","All Govt Services - 47 Counties"),
+
+    {
+  "id": "website-design",
+  "name": "Website Design",
+  "icon": "🎨",
+  "price": 5000,
+  "description": "Professional modern website design - business, portfolio, landing page. Mobile-friendly, fast, with M-Pesa integration.",
+  "delivery": "3 Days"
+},
+{
+  "id": "website-development",
+  "name": "Website Development",
+  "icon": "💻",
+  "price": 15000,
+  "description": "Full website development - eCommerce, booking system, cyber portal like Cyber Mtaani. Hosting + domain + M-Pesa Till + admin panel included.",
+  "delivery": "7 Days"
+}
 ]
 
 PAGE = """
